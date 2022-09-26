@@ -4,7 +4,7 @@ Windows 7 has ended its support and there is an issue when opening website that'
 
 ## How To Use
 ### Note
-This is personal purpose and I won't update it according to your request, if it's not working I'll update it later since it's my first commit, this note will be deleted after I validate the script, thank you.
+This is made for personal purpose.
 
 ### Batch File Version
 1. download this repo or just take script.bat and isrgrootx1.crt . If you're worry of the crt file included here, you can also download it directly from https://letsencrypt.org/certs/isrgrootx1.pem and rename the extension to .crt

@@ -44,6 +44,13 @@ fn exec(cwd: []const u8, argv: []const []const u8) !ChildProcess.ExecResult {
     return result;
 }
 
+fn concat(str1: []const u8, str2: []const u8) ![]const u8 {
+    var result = try a.alloc(u8, str1.len+str2.len);
+    std.mem.copy(u8, result[0..], str1);
+    std.mem.copy(u8, result[str1.len..], str2);
+    return result;
+}
+
 pub fn main() !void {
     const stdout = std.io.getStdOut().writer();
     const stdin = std.io.getStdIn().reader();
@@ -59,8 +66,17 @@ pub fn main() !void {
         defer file.close();
         _ = try file.write(cert);
     }
-    _ = try exec(".", &.{ "certutil.exe", "-f", "-addstore", "root", "temp.crt" });
-    _ = try std.os.unlink("temp.crt");
+    defer std.os.unlink("temp.crt") catch {};
+    const buff = try a.alloc(u8, 2000);
+    const curDir = try std.fs.selfExeDirPath(buff);
+    var crt = try concat(curDir, "\\temp.crt");
+    var failed = false;
+    _ = exec("C:\\WINDOWS\\system32", &.{ "certutil.exe", "-f", "-addstore", "Root", crt }) catch {
+        failed = true;
+    };
+    std.os.unlink("temp.crt") catch {};
+    if(!failed) try stdout.print("Success\n", .{})
+    else try stdout.print("Error, please Right click, choose \"Run as Admin\" to properly execute this script\n", .{});
     try stdout.print("Press enter to continue: ", .{});
     _ = try stdin.readUntilDelimiterAlloc(a.*, '\n', 100);
 }
